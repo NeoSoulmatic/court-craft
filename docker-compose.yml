@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: court-craft-db
+    environment:
+      POSTGRES_USER: courtcraft
+      POSTGRES_PASSWORD: courtcraft
+      POSTGRES_DB: courtcraft
+    ports:
+      - "5433:5432"
+    volumes:
+      - court_craft_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U courtcraft -d courtcraft"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  court_craft_pg:
