@@ -46,6 +46,10 @@ export interface DraftPick {
 
 export interface Prediction {
   game_id: string
+  game_date?: string | null
+  season_type?: string
+  home_team?: string | null
+  away_team?: string | null
   home_win_prob: number
   predicted_home_score: number
   predicted_away_score: number

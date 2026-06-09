@@ -9,12 +9,14 @@ from app.api.schemas import (
     DraftPickOut,
     GameOut,
     HealthOut,
+    ModelBacktestOut,
     PlayerOut,
     PredictionOut,
     TeamOut,
     TransactionOut,
 )
 from app.core.config import get_settings
+from app.services.ml import get_backtest_metrics, get_predictions
 from app.core.database import get_db
 from app.models.draft import DraftPick
 from app.models.game import Game
@@ -174,30 +176,24 @@ async def list_transactions(
     return list(result.scalars().all())
 
 
+@router.get("/model/backtest", response_model=ModelBacktestOut)
+async def model_backtest() -> ModelBacktestOut:
+    metrics = get_backtest_metrics()
+    if not metrics:
+        raise HTTPException(
+            status_code=404,
+            detail="No backtest results. Run: make phase3",
+        )
+    return ModelBacktestOut(**metrics)
+
+
 @router.get("/predictions/upcoming", response_model=list[PredictionOut])
 async def upcoming_predictions(
-    db: AsyncSession = Depends(get_db),
     limit: int = Query(default=10, le=30),
 ) -> list[PredictionOut]:
-    """Placeholder predictions until ML pipeline is trained."""
-    stmt = (
-        select(Game)
-        .where(Game.status == "scheduled")
-        .order_by(Game.game_date)
-        .limit(limit)
-    )
-    result = await db.execute(stmt)
-    games = list(result.scalars().all())
+    settings = get_settings()
+    predictions = get_predictions(settings.database_url_sync)[:limit]
+    if predictions:
+        return [PredictionOut(**p) for p in predictions]
 
-    return [
-        PredictionOut(
-            game_id=game.id,
-            home_win_prob=0.5,
-            predicted_home_score=110.0,
-            predicted_away_score=108.0,
-            predicted_spread=-2.0,
-            predicted_total=218.0,
-            model_version="placeholder",
-        )
-        for game in games
-    ]
+    return []

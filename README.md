@@ -82,12 +82,32 @@ make phase2b
 
 Scrapes Basketball Reference season transaction pages (~3 requests, one per configured season).
 
+## Phase 3 (ML pipeline)
+
+Train XGBoost score models, backtest on **2025-26** holdout, wire predictions to the API:
+
+```bash
+make phase3
+```
+
+Requires Postgres populated (`make backfill`). Downloads free historical odds automatically. See `ml/odds/README.md` for the odds data source.
+
+### Playoff predictions (demo)
+
+The model is trained on **regular season only**. Playoff projections use the same model for showcase purposes:
+
+```bash
+make playoffs   # ingest playoff results + schedule, refresh predictions
+```
+
+Upcoming Finals games appear on the dashboard with a **Playoffs** badge and an experimental disclaimer.
+
 ## Roadmap
 
 - [x] **Phase 1** — Monorepo scaffold, DB schema, ETL skeleton, API, UI shell
 - [x] **Phase 2** — Player rosters + draft history ingest
 - [x] **Phase 2b** — Transaction timeline
-- [ ] **Phase 3** — Feature pipeline, model training, backtest page
+- [x] **Phase 3** — Feature pipeline, model training, backtest page
 - [ ] **Phase 4** — Live predictions on dashboard
 - [ ] **Phase 5** — Docker all-in-one, deploy demo, README polish
 

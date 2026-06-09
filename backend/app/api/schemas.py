@@ -33,6 +33,7 @@ class GameOut(BaseModel):
 
     id: str
     season: str
+    season_type: str = "Regular Season"
     game_date: date
     game_datetime_utc: datetime | None
     home_team_id: int
@@ -73,12 +74,41 @@ class HealthOut(BaseModel):
     seasons_configured: list[str]
 
 
+class MarketMetricOut(BaseModel):
+    games: int | None = None
+    games_with_odds: int | None = None
+    accuracy: float | None = None
+    hit_rate: float | None = None
+    model_pick_hit_rate: float | None = None
+    model_over_hit_rate: float | None = None
+    vegas_baseline_over_50: float | None = None
+    vegas_over_rate: float | None = None
+    note: str | None = None
+
+
+class ModelBacktestOut(BaseModel):
+    model_version: str
+    train_seasons: list[str]
+    test_season: str
+    regular_season_only: bool
+    moneyline: MarketMetricOut
+    spread: MarketMetricOut
+    total: MarketMetricOut
+    errors: dict[str, float]
+    odds_source: str
+    odds_coverage_note: str
+
+
 class PredictionOut(BaseModel):
     game_id: str
+    game_date: date | None = None
+    season_type: str = "Regular Season"
+    home_team: str | None = None
+    away_team: str | None = None
     home_win_prob: float
     predicted_home_score: float
     predicted_away_score: float
     predicted_spread: float  # home perspective (negative = home favored)
     predicted_total: float
     model_version: str
-    note: str = "Placeholder — train model in ml/ to enable live predictions"
+    note: str | None = None

@@ -46,14 +46,14 @@ export function DashboardPage() {
         <CardHeader>
           <CardTitle>Upcoming predictions</CardTitle>
           <CardDescription>
-            Placeholder until ML pipeline is trained. Shows moneyline, spread, and total targets.
+            Model projections for scheduled games (run make phase3 to train).
           </CardDescription>
         </CardHeader>
         <CardContent>
           {predictions.isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
           {predictions.data?.length === 0 && (
             <p className="text-sm text-muted-foreground">
-              No scheduled games in DB yet. Run the ETL backfill after starting Postgres.
+              No predictions yet — need scheduled games and a trained model (make phase3).
             </p>
           )}
           <div className="space-y-3">
@@ -63,8 +63,20 @@ export function DashboardPage() {
                 className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/60 bg-card/50 px-4 py-3"
               >
                 <div>
-                  <p className="font-medium">Game {p.game_id}</p>
-                  <p className="text-xs text-muted-foreground">{p.note}</p>
+                  <p className="font-medium">
+                    {p.away_team && p.home_team
+                      ? `${p.away_team} @ ${p.home_team}`
+                      : `Game ${p.game_id}`}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {p.game_date}
+                    {p.season_type === "Playoffs" && (
+                      <Badge variant="default" className="ml-2">
+                        Playoffs
+                      </Badge>
+                    )}
+                  </p>
+                  {p.note && <p className="text-xs text-amber-400/90">{p.note}</p>}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary">

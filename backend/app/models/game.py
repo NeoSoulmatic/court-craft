@@ -18,6 +18,9 @@ class Game(Base):
     home_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     away_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="scheduled")  # scheduled | final
+    season_type: Mapped[str] = mapped_column(
+        String(20), default="Regular Season", index=True
+    )  # Regular Season | Playoffs
 
     home_team: Mapped["Team"] = relationship(foreign_keys=[home_team_id])  # noqa: F821
     away_team: Mapped["Team"] = relationship(foreign_keys=[away_team_id])  # noqa: F821

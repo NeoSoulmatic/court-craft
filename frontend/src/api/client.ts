@@ -2,7 +2,7 @@ import axios from "axios"
 
 import type { DraftPick, Game, Health, Player, Prediction, Team, Transaction } from "@/types"
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: "/api/v1",
   timeout: 15000,
 })
