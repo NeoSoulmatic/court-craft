@@ -1,6 +1,15 @@
 import axios from "axios"
 
-import type { DraftPick, Game, Health, Player, Prediction, Team, Transaction } from "@/types"
+import type {
+  DraftPick,
+  Game,
+  Health,
+  OddsStatus,
+  Player,
+  Prediction,
+  Team,
+  Transaction,
+} from "@/types"
 
 export const api = axios.create({
   baseURL: "/api/v1",
@@ -64,5 +73,10 @@ export async function getTransactionTypes(): Promise<string[]> {
 
 export async function getUpcomingPredictions(): Promise<Prediction[]> {
   const { data } = await api.get<Prediction[]>("/predictions/upcoming")
+  return data
+}
+
+export async function getOddsStatus(): Promise<OddsStatus> {
+  const { data } = await api.get<OddsStatus>("/odds/status")
   return data
 }

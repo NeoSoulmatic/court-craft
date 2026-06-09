@@ -1,6 +1,6 @@
 BACKEND_UVICORN := backend/.venv/bin/uvicorn
 
-.PHONY: db up down backend frontend backfill phase2 phase2b phase3 playoffs
+.PHONY: db up down backend frontend backfill phase2 phase2b phase3 playoffs daily
 
 db:
 	docker compose up -d
@@ -29,3 +29,6 @@ phase3:
 playoffs:
 	cd backend && .venv/bin/python -m app.ingest.run_playoffs
 	cd backend && PYTHONPATH=.. .venv/bin/python ../ml/predict.py
+
+daily:
+	cd backend && .venv/bin/python -m app.ingest.run_daily

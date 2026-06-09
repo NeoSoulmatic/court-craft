@@ -10,6 +10,7 @@ from app.api.schemas import (
     GameOut,
     HealthOut,
     ModelBacktestOut,
+    OddsStatusOut,
     PlayerOut,
     PredictionOut,
     TeamOut,
@@ -17,6 +18,7 @@ from app.api.schemas import (
 )
 from app.core.config import get_settings
 from app.services.ml import get_backtest_metrics, get_predictions
+from app.services.odds import enrich_predictions, get_odds_status
 from app.core.database import get_db
 from app.models.draft import DraftPick
 from app.models.game import Game
@@ -187,13 +189,19 @@ async def model_backtest() -> ModelBacktestOut:
     return ModelBacktestOut(**metrics)
 
 
+@router.get("/odds/status", response_model=OddsStatusOut)
+async def odds_status() -> OddsStatusOut:
+    return OddsStatusOut(**get_odds_status())
+
+
 @router.get("/predictions/upcoming", response_model=list[PredictionOut])
 async def upcoming_predictions(
     limit: int = Query(default=10, le=30),
+    refresh_odds: bool = Query(default=False, description="Force refresh live odds (uses API quota)"),
 ) -> list[PredictionOut]:
     settings = get_settings()
     predictions = get_predictions(settings.database_url_sync)[:limit]
-    if predictions:
-        return [PredictionOut(**p) for p in predictions]
-
-    return []
+    if not predictions:
+        return []
+    enriched = enrich_predictions(predictions, force_fetch=refresh_odds)
+    return [PredictionOut(**p) for p in enriched]

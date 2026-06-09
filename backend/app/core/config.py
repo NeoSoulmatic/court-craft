@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     database_url_sync: str = "postgresql://courtcraft:courtcraft@localhost:5433/courtcraft"
     cors_origins: str = "http://localhost:5173"
     seasons_backfill: str = "2022-23,2023-24,2024-25,2025-26"
+    odds_api_key: str | None = None
+    odds_api_regions: str = "us"
+    odds_cache_hours: int = 6
 
     @property
     def cors_origin_list(self) -> list[str]:

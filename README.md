@@ -102,13 +102,39 @@ make playoffs   # ingest playoff results + schedule, refresh predictions
 
 Upcoming Finals games appear on the dashboard with a **Playoffs** badge and an experimental disclaimer.
 
+## Phase 4 (live odds + market comparison)
+
+Compare model projections to live market lines with implied win % and quarter-Kelly hints.
+
+### 1. Get an Odds API key
+
+1. Sign up at [the-odds-api.com](https://the-odds-api.com/) (free tier: **500 requests/month**).
+2. Add to `.env`:
+
+```env
+ODDS_API_KEY=your_key_here
+```
+
+### 2. Daily refresh
+
+```bash
+make daily   # re-ingest current season, fetch odds, refresh predictions
+```
+
+Odds are cached for 6 hours (`ODDS_CACHE_HOURS`) so normal dashboard loads do not burn API quota.
+
+### API
+
+- `GET /api/v1/predictions/upcoming` — model + market enrichment
+- `GET /api/v1/odds/status` — cache age and remaining monthly requests
+
 ## Roadmap
 
 - [x] **Phase 1** — Monorepo scaffold, DB schema, ETL skeleton, API, UI shell
 - [x] **Phase 2** — Player rosters + draft history ingest
 - [x] **Phase 2b** — Transaction timeline
 - [x] **Phase 3** — Feature pipeline, model training, backtest page
-- [ ] **Phase 4** — Live predictions on dashboard
+- [x] **Phase 4** — Live odds, model vs market, Kelly hints, daily job
 - [ ] **Phase 5** — Docker all-in-one, deploy demo, README polish
 
 ## Expanding beyond 3 seasons

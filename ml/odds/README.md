@@ -26,4 +26,4 @@ The free `OddsData.sqlite` file has **partial 2025-26** lines (~514 of 1,230 gam
 
 - Playoff odds (regular season only in v1)
 - Optional Kaggle dataset merge for fuller 2025-26 coverage
-- Paid Odds API for live line comparison (Phase 4)
+- Live lines via [The Odds API](https://the-odds-api.com/) — see README Phase 4 (`make daily`)

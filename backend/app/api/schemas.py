@@ -112,3 +112,41 @@ class PredictionOut(BaseModel):
     predicted_total: float
     model_version: str
     note: str | None = None
+    # Live market (The Odds API)
+    market_available: bool = False
+    market_bookmaker: str | None = None
+    market_home_moneyline: int | None = None
+    market_away_moneyline: int | None = None
+    market_home_implied_prob: float | None = None
+    market_away_implied_prob: float | None = None
+    market_spread_home: float | None = None
+    market_total: float | None = None
+    ml_pick_side: str | None = None
+    ml_edge: float | None = None
+    ml_quarter_kelly_pct: float | None = None
+    spread_pick_side: str | None = None
+    spread_cover_prob_model: float | None = None
+    spread_cover_prob_market: float | None = None
+    spread_edge: float | None = None
+    spread_quarter_kelly_pct: float | None = None
+    total_pick_side: str | None = None
+    total_win_prob_model: float | None = None
+    total_win_prob_market: float | None = None
+    total_edge: float | None = None
+    total_quarter_kelly_pct: float | None = None
+    odds_fetched_at: str | None = None
+    odds_requests_remaining: int | None = None
+    odds_stale: bool = False
+    odds_hint: str | None = None
+
+
+class OddsStatusOut(BaseModel):
+    configured: bool
+    cache_path: str
+    fetched_at: str | None = None
+    requests_remaining: int | None = None
+    event_count: int = 0
+    stale: bool = False
+    error: str | None = None
+    signup_url: str
+    budget_note: str

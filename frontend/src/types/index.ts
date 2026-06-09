@@ -57,6 +57,42 @@ export interface Prediction {
   predicted_total: number
   model_version: string
   note?: string
+  market_available?: boolean
+  market_bookmaker?: string | null
+  market_home_moneyline?: number | null
+  market_away_moneyline?: number | null
+  market_home_implied_prob?: number | null
+  market_spread_home?: number | null
+  market_total?: number | null
+  ml_pick_side?: string | null
+  ml_edge?: number | null
+  ml_quarter_kelly_pct?: number | null
+  spread_pick_side?: string | null
+  spread_cover_prob_model?: number | null
+  spread_cover_prob_market?: number | null
+  spread_edge?: number | null
+  spread_quarter_kelly_pct?: number | null
+  total_pick_side?: string | null
+  total_win_prob_model?: number | null
+  total_win_prob_market?: number | null
+  total_edge?: number | null
+  total_quarter_kelly_pct?: number | null
+  odds_fetched_at?: string | null
+  odds_requests_remaining?: number | null
+  odds_stale?: boolean
+  odds_hint?: string | null
+}
+
+export interface OddsStatus {
+  configured: boolean
+  cache_path: string
+  fetched_at?: string | null
+  requests_remaining?: number | null
+  event_count: number
+  stale: boolean
+  error?: string | null
+  signup_url: string
+  budget_note: string
 }
 
 export interface Transaction {
