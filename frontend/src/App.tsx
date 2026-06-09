@@ -8,6 +8,7 @@ import { GamesPage } from "@/pages/GamesPage"
 import { ModelPage } from "@/pages/ModelPage"
 import { PlayersPage } from "@/pages/PlayersPage"
 import { TeamsPage } from "@/pages/TeamsPage"
+import { TransactionsPage } from "@/pages/TransactionsPage"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="teams" element={<TeamsPage />} />
             <Route path="players" element={<PlayersPage />} />
             <Route path="draft" element={<DraftPage />} />
+            <Route path="transactions" element={<TransactionsPage />} />
             <Route path="model" element={<ModelPage />} />
           </Route>
         </Routes>

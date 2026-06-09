@@ -5,13 +5,22 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.api.schemas import DraftPickOut, GameOut, HealthOut, PlayerOut, PredictionOut, TeamOut
+from app.api.schemas import (
+    DraftPickOut,
+    GameOut,
+    HealthOut,
+    PlayerOut,
+    PredictionOut,
+    TeamOut,
+    TransactionOut,
+)
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.models.draft import DraftPick
 from app.models.game import Game
 from app.models.player import Player
 from app.models.team import Team
+from app.models.transaction import Transaction
 
 router = APIRouter()
 
@@ -137,6 +146,30 @@ async def list_draft_picks(
         stmt = stmt.where(DraftPick.season == season)
     else:
         stmt = stmt.order_by(DraftPick.season.desc(), DraftPick.pick_overall)
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
+
+
+@router.get("/transactions/types", response_model=list[str])
+async def list_transaction_types(db: AsyncSession = Depends(get_db)) -> list[str]:
+    result = await db.execute(
+        select(Transaction.transaction_type).distinct().order_by(Transaction.transaction_type)
+    )
+    return list(result.scalars().all())
+
+
+@router.get("/transactions", response_model=list[TransactionOut])
+async def list_transactions(
+    db: AsyncSession = Depends(get_db),
+    season: str | None = Query(default=None),
+    transaction_type: str | None = Query(default=None),
+    limit: int = Query(default=100, le=500),
+) -> list[Transaction]:
+    stmt = select(Transaction).order_by(Transaction.transaction_date.desc()).limit(limit)
+    if season:
+        stmt = stmt.where(Transaction.season == season)
+    if transaction_type:
+        stmt = stmt.where(Transaction.transaction_type == transaction_type)
     result = await db.execute(stmt)
     return list(result.scalars().all())
 

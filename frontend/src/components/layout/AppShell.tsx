@@ -1,4 +1,13 @@
-import { BarChart3, LayoutDashboard, Trophy, Users, UserCircle, FileText, Brain } from "lucide-react"
+import {
+  ArrowLeftRight,
+  BarChart3,
+  Brain,
+  FileText,
+  LayoutDashboard,
+  Trophy,
+  UserCircle,
+  Users,
+} from "lucide-react"
 import { NavLink, Outlet } from "react-router-dom"
 
 import { cn } from "@/lib/utils"
@@ -10,6 +19,7 @@ const navItems = [
   { to: "/teams", label: "Teams", icon: Users },
   { to: "/players", label: "Players", icon: UserCircle },
   { to: "/draft", label: "Draft", icon: FileText },
+  { to: "/transactions", label: "Moves", icon: ArrowLeftRight },
   { to: "/model", label: "Model", icon: Brain },
 ]
 

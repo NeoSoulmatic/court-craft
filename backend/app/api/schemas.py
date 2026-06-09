@@ -57,6 +57,17 @@ class DraftPickOut(BaseModel):
     college: str | None
 
 
+class TransactionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    transaction_date: date
+    season: str
+    transaction_type: str
+    description: str
+    source: str
+
+
 class HealthOut(BaseModel):
     status: str
     seasons_configured: list[str]

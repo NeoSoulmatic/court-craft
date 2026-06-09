@@ -55,6 +55,15 @@ export interface Prediction {
   note?: string
 }
 
+export interface Transaction {
+  id: number
+  transaction_date: string
+  season: string
+  transaction_type: string
+  description: string
+  source: string
+}
+
 export interface Health {
   status: string
   seasons_configured: string[]

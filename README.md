@@ -37,9 +37,8 @@ API docs: http://localhost:8000/docs
 ### 3. Data backfill (3 seasons)
 
 ```bash
-cd backend
-source .venv/bin/activate
-python -m app.ingest.run_backfill
+make backfill
+# or: cd backend && .venv/bin/python -m app.ingest.run_backfill
 ```
 
 Takes a few minutes — `nba_api` rate-limits requests.
@@ -75,11 +74,19 @@ make phase2
 
 Takes ~1–2 minutes (30 roster API calls + draft history).
 
+## Phase 2b ingest (transactions)
+
+```bash
+make phase2b
+```
+
+Scrapes Basketball Reference season transaction pages (~3 requests, one per configured season).
+
 ## Roadmap
 
 - [x] **Phase 1** — Monorepo scaffold, DB schema, ETL skeleton, API, UI shell
 - [x] **Phase 2** — Player rosters + draft history ingest
-- [ ] **Phase 2b** — Transaction timeline
+- [x] **Phase 2b** — Transaction timeline
 - [ ] **Phase 3** — Feature pipeline, model training, backtest page
 - [ ] **Phase 4** — Live predictions on dashboard
 - [ ] **Phase 5** — Docker all-in-one, deploy demo, README polish
@@ -99,7 +106,8 @@ Re-run the backfill script. No schema changes needed.
 | Data | Source |
 |------|--------|
 | Games, box scores | `nba_api` |
-| Draft history | Kaggle / BBRef CSV (Phase 2) |
+| Draft history | `nba_api` DraftHistory |
+| Transactions | Basketball Reference season pages |
 | Historical odds | Kaggle closing-lines datasets (Phase 3) |
 | Live odds | The Odds API free tier — 500 req/month (Phase 4) |
 
