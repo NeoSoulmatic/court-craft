@@ -1,6 +1,8 @@
+import os
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -21,6 +23,32 @@ class Settings(BaseSettings):
     odds_api_key: str | None = None
     odds_api_regions: str = "us"
     odds_cache_hours: int = 6
+    serve_static: bool = False
+    port: int = 8000
+
+    @model_validator(mode="after")
+    def apply_platform_env(self) -> "Settings":
+        """Map Render/Heroku DATABASE_URL and optional PORT."""
+        raw_db = os.getenv("DATABASE_URL")
+        if raw_db:
+            sync = raw_db.replace("postgresql+asyncpg://", "postgresql://", 1).replace(
+                "postgres://", "postgresql://", 1
+            )
+            object.__setattr__(self, "database_url_sync", sync)
+            object.__setattr__(
+                self,
+                "database_url",
+                sync.replace("postgresql://", "postgresql+asyncpg://", 1),
+            )
+
+        raw_port = os.getenv("PORT")
+        if raw_port:
+            object.__setattr__(self, "port", int(raw_port))
+
+        if os.getenv("SERVE_STATIC", "").lower() in ("1", "true", "yes"):
+            object.__setattr__(self, "serve_static", True)
+
+        return self
 
     @property
     def cors_origin_list(self) -> list[str]:

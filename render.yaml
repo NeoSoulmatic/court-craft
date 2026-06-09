@@ -1,0 +1,31 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Connect this repo, apply blueprint, then run one-time data setup (see README).
+
+databases:
+  - name: court-craft-db
+    plan: free
+    databaseName: courtcraft
+    user: courtcraft
+
+services:
+  - type: web
+    name: court-craft
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: court-craft-db
+          property: connectionString
+      - key: SERVE_STATIC
+        value: "1"
+      - key: CORS_ORIGINS
+        value: https://court-craft.onrender.com
+      - key: SEASONS_BACKFILL
+        value: 2022-23,2023-24,2024-25,2025-26
+      - key: ODDS_API_KEY
+        sync: false
+      - key: ODDS_CACHE_HOURS
+        value: "12"

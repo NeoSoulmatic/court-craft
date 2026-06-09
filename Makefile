@@ -1,12 +1,18 @@
 BACKEND_UVICORN := backend/.venv/bin/uvicorn
 
-.PHONY: db up down backend frontend backfill phase2 phase2b phase3 playoffs daily
+.PHONY: db up down stack backend frontend backfill phase2 phase2b phase3 playoffs daily
 
 db:
-	docker compose up -d
+	docker compose up -d db
 
 down:
-	docker compose down
+	docker compose --profile full down
+
+stack:
+	docker compose --profile full up --build -d
+
+stack-logs:
+	docker compose --profile full logs -f
 
 backend:
 	cd backend && $(BACKEND_UVICORN) app.main:app --reload --port 8000

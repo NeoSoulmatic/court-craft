@@ -16,5 +16,38 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: court-craft-api
+    environment:
+      DATABASE_URL: postgresql+asyncpg://courtcraft:courtcraft@db:5432/courtcraft
+      DATABASE_URL_SYNC: postgresql://courtcraft:courtcraft@db:5432/courtcraft
+      CORS_ORIGINS: http://localhost:8080,http://localhost:5173
+      ODDS_API_KEY: ${ODDS_API_KEY:-}
+      ODDS_API_REGIONS: ${ODDS_API_REGIONS:-us}
+      ODDS_CACHE_HOURS: ${ODDS_CACHE_HOURS:-6}
+      SEASONS_BACKFILL: ${SEASONS_BACKFILL:-2022-23,2023-24,2024-25,2025-26}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - full
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: court-craft-web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    profiles:
+      - full
+
 volumes:
   court_craft_pg:

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { getGames, getHealth, getOddsStatus, getTeams, getUpcomingPredictions } from "@/api/client"
+import { getGames, getOddsStatus, getTeams, getUpcomingPredictions } from "@/api/client"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { Prediction } from "@/types"
@@ -134,7 +134,6 @@ function PredictionCard({ p }: { p: Prediction }) {
 }
 
 export function DashboardPage() {
-  const health = useQuery({ queryKey: ["health"], queryFn: getHealth })
   const teams = useQuery({ queryKey: ["teams"], queryFn: getTeams })
   const games = useQuery({ queryKey: ["games", { limit: 10 }], queryFn: () => getGames({ limit: 10 }) })
   const predictions = useQuery({ queryKey: ["predictions"], queryFn: getUpcomingPredictions })
