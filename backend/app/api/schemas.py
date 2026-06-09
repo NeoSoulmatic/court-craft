@@ -21,7 +21,10 @@ class PlayerOut(BaseModel):
     id: int
     full_name: str
     team_id: int | None
+    team_abbreviation: str | None = None
     position: str | None
+    height: str | None = None
+    weight: int | None = None
     is_active: bool
 
 

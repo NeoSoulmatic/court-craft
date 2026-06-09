@@ -65,10 +65,21 @@ court-craft/
 └── docker-compose.yml
 ```
 
+## Phase 2 ingest (players + draft)
+
+After Phase 1 backfill, load rosters and draft history:
+
+```bash
+make phase2
+```
+
+Takes ~1–2 minutes (30 roster API calls + draft history).
+
 ## Roadmap
 
 - [x] **Phase 1** — Monorepo scaffold, DB schema, ETL skeleton, API, UI shell
-- [ ] **Phase 2** — Draft ingest, transaction timeline
+- [x] **Phase 2** — Player rosters + draft history ingest
+- [ ] **Phase 2b** — Transaction timeline
 - [ ] **Phase 3** — Feature pipeline, model training, backtest page
 - [ ] **Phase 4** — Live predictions on dashboard
 - [ ] **Phase 5** — Docker all-in-one, deploy demo, README polish

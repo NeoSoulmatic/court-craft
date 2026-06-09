@@ -12,7 +12,10 @@ export interface Player {
   id: number
   full_name: string
   team_id: number | null
+  team_abbreviation: string | null
   position: string | null
+  height: string | null
+  weight: number | null
   is_active: boolean
 }
 

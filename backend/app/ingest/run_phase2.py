@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Run initial data backfill for configured seasons.
+"""Run Phase 2 ingest only (players + draft) without re-fetching games.
 
-Usage (from repo root):
-    cd backend && python -m app.ingest.run_backfill
+Usage:
+    cd backend && python -m app.ingest.run_phase2
 """
 
 import sys
-import time
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -15,9 +14,7 @@ from app.core.config import get_settings
 from app.core.database import Base
 import app.models  # noqa: F401
 from app.ingest.draft import ingest_draft_history
-from app.ingest.games import ingest_season_games
 from app.ingest.players import ingest_players
-from app.ingest.teams import ingest_teams
 
 
 def main() -> None:
@@ -27,39 +24,22 @@ def main() -> None:
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    print(f"Court Craft backfill — seasons: {settings.seasons_list}")
-    print("Ingesting teams...")
-    team_count = ingest_teams(session)
-    print(f"  {team_count} teams upserted")
-
-    total_games = 0
-    for season in settings.seasons_list:
-        print(f"Ingesting games for {season}...")
-        try:
-            count = ingest_season_games(session, season)
-            total_games += count
-            print(f"  {count} games upserted")
-        except Exception as exc:
-            print(f"  ERROR for {season}: {exc}", file=sys.stderr)
-        time.sleep(1.0)
-
-    print(f"Games done. Total new games: {total_games}")
-
-    print("Ingesting players (static + rosters)...")
+    print("Phase 2 ingest — players + draft")
     try:
         static_count, roster_count = ingest_players(session, season=settings.seasons_list[-1])
         print(f"  {static_count} players in index, {roster_count} roster rows updated")
     except Exception as exc:
         print(f"  ERROR ingesting players: {exc}", file=sys.stderr)
+        raise
 
-    print("Ingesting draft history...")
     try:
         draft_count = ingest_draft_history(session)
         print(f"  {draft_count} draft picks upserted")
     except Exception as exc:
         print(f"  ERROR ingesting draft: {exc}", file=sys.stderr)
+        raise
 
-    print("Backfill complete.")
+    print("Phase 2 complete.")
     session.close()
 
 

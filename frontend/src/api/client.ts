@@ -20,9 +20,15 @@ export async function getTeams(): Promise<Team[]> {
 export async function getPlayers(params?: {
   team_id?: number
   active_only?: boolean
+  search?: string
   limit?: number
 }): Promise<Player[]> {
   const { data } = await api.get<Player[]>("/players", { params })
+  return data
+}
+
+export async function getDraftSeasons(): Promise<string[]> {
+  const { data } = await api.get<string[]>("/draft/seasons")
   return data
 }
 

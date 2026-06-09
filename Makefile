@@ -14,3 +14,6 @@ frontend:
 
 backfill:
 	cd backend && python -m app.ingest.run_backfill
+
+phase2:
+	cd backend && python -m app.ingest.run_phase2

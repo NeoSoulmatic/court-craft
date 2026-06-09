@@ -16,6 +16,19 @@ from app.models.team import Team
 router = APIRouter()
 
 
+def _player_out(player: Player) -> PlayerOut:
+    return PlayerOut(
+        id=player.id,
+        full_name=player.full_name,
+        team_id=player.team_id,
+        team_abbreviation=player.team.abbreviation if player.team else None,
+        position=player.position,
+        height=player.height,
+        weight=player.weight,
+        is_active=player.is_active,
+    )
+
+
 @router.get("/health", response_model=HealthOut)
 async def health() -> HealthOut:
     settings = get_settings()
@@ -41,23 +54,33 @@ async def list_players(
     db: AsyncSession = Depends(get_db),
     team_id: int | None = Query(default=None),
     active_only: bool = Query(default=True),
+    search: str | None = Query(default=None),
     limit: int = Query(default=100, le=500),
-) -> list[Player]:
-    stmt = select(Player).order_by(Player.full_name).limit(limit)
+) -> list[PlayerOut]:
+    stmt = (
+        select(Player)
+        .options(selectinload(Player.team))
+        .order_by(Player.full_name)
+        .limit(limit)
+    )
     if team_id is not None:
         stmt = stmt.where(Player.team_id == team_id)
     if active_only:
         stmt = stmt.where(Player.is_active.is_(True))
+    if search:
+        stmt = stmt.where(Player.full_name.ilike(f"%{search}%"))
     result = await db.execute(stmt)
-    return list(result.scalars().all())
+    return [_player_out(p) for p in result.scalars().all()]
 
 
 @router.get("/players/{player_id}", response_model=PlayerOut)
-async def get_player(player_id: int, db: AsyncSession = Depends(get_db)) -> Player:
-    player = await db.get(Player, player_id)
+async def get_player(player_id: int, db: AsyncSession = Depends(get_db)) -> PlayerOut:
+    stmt = select(Player).options(selectinload(Player.team)).where(Player.id == player_id)
+    result = await db.execute(stmt)
+    player = result.scalar_one_or_none()
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
-    return player
+    return _player_out(player)
 
 
 @router.get("/games", response_model=list[GameOut])
@@ -95,15 +118,25 @@ async def get_game(game_id: str, db: AsyncSession = Depends(get_db)) -> Game:
     return game
 
 
+@router.get("/draft/seasons", response_model=list[str])
+async def list_draft_seasons(db: AsyncSession = Depends(get_db)) -> list[str]:
+    result = await db.execute(
+        select(DraftPick.season).distinct().order_by(DraftPick.season.desc())
+    )
+    return list(result.scalars().all())
+
+
 @router.get("/draft", response_model=list[DraftPickOut])
 async def list_draft_picks(
     db: AsyncSession = Depends(get_db),
     season: str | None = Query(default=None),
     limit: int = Query(default=60, le=300),
 ) -> list[DraftPick]:
-    stmt = select(DraftPick).order_by(DraftPick.season.desc(), DraftPick.pick_overall).limit(limit)
+    stmt = select(DraftPick).order_by(DraftPick.pick_overall).limit(limit)
     if season:
         stmt = stmt.where(DraftPick.season == season)
+    else:
+        stmt = stmt.order_by(DraftPick.season.desc(), DraftPick.pick_overall)
     result = await db.execute(stmt)
     return list(result.scalars().all())
 
