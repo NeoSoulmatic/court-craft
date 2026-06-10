@@ -1,6 +1,6 @@
 BACKEND_UVICORN := backend/.venv/bin/uvicorn
 
-.PHONY: db up down stack backend frontend backfill phase2 phase2b phase3 playoffs daily
+.PHONY: db up down stack backend frontend backfill phase2 phase2b phase3 playoffs daily test
 
 db:
 	docker compose up -d db
@@ -38,3 +38,9 @@ playoffs:
 
 daily:
 	cd backend && .venv/bin/python -m app.ingest.run_daily
+
+test:
+	backend/.venv/bin/pip install -q -r requirements-dev.txt
+	DATABASE_URL=postgresql+asyncpg://courtcraft:courtcraft@localhost:5433/courtcraft \
+	DATABASE_URL_SYNC=postgresql://courtcraft:courtcraft@localhost:5433/courtcraft \
+	backend/.venv/bin/pytest -q

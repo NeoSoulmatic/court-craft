@@ -1,0 +1,48 @@
+name: Daily refresh
+
+# Refresh production data + odds + predictions (optional — requires hosted DB).
+on:
+  schedule:
+    # 14:00 UTC ≈ 9–10am US Eastern (standard time)
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    name: Production daily job
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required secrets
+        id: secrets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "DATABASE_URL secret not set — skipping daily refresh."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.secrets.outputs.configured == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        if: steps.secrets.outputs.configured == 'true'
+        run: pip install -r backend/requirements.txt
+
+      - name: Run daily refresh
+        if: steps.secrets.outputs.configured == 'true'
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          PYTHONPATH: ..
+        run: python -m app.ingest.run_daily

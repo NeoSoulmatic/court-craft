@@ -173,6 +173,28 @@ Edit `SEASONS_BACKFILL` in `.env` and re-run `make backfill`.
 | Historical odds | kyleskom OddsData.sqlite (Phase 3) |
 | Live odds | The Odds API (Phase 4) |
 
+## CI/CD (GitHub Actions)
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| **CI** | Push / PR to `main` | Pytest, frontend lint + build, Docker image builds |
+| **Deploy** | After CI succeeds on `main` | POST to Render deploy hook (optional) |
+| **Daily refresh** | Cron + manual | Production `make daily` via GitHub secrets |
+
+### Repo secrets (optional)
+
+| Secret | Used by |
+|--------|---------|
+| `RENDER_DEPLOY_HOOK_URL` | Deploy — from Render → Service → Settings → Deploy Hook |
+| `DATABASE_URL` | Daily — Render Postgres **Internal** URL (`postgres://...`) |
+| `ODDS_API_KEY` | Daily — live odds fetch |
+
+If Render is already connected to GitHub, pushes to `main` auto-deploy; the deploy hook is a backup.
+
+Local tests: `pip install -r requirements-dev.txt && pytest`
+
+---
+
 ## Roadmap
 
 - [x] Phase 1 — Scaffold, DB, ETL, API, UI
